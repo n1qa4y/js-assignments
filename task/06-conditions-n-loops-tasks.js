@@ -30,6 +30,14 @@
  *
  */
 function getFizzBuzz(num) {
+    if (num%3 == 0 && num%5 == 0)
+        return 'FizzBuzz';
+    else if (num%3 == 0)
+        return 'Fizz';
+    else if (num%5 == 0)
+        return 'Buzz'
+    else
+        return num;
     throw new Error('Not implemented');
 }
 
@@ -46,6 +54,10 @@ function getFizzBuzz(num) {
  *   10 => 3628800
  */
 function getFactorial(n) {
+    var res = 1;
+    for (var i = 1; i < n+1; i++)
+        res = res * i;
+    return res;
     throw new Error('Not implemented');
 }
 
@@ -63,6 +75,10 @@ function getFactorial(n) {
  *   -1,1  =>  0  ( = -1 + 0 + 1 )
  */
 function getSumBetweenNumbers(n1, n2) {
+    var res = 0;
+    for (var i = n1; i < n2+1; i++)
+        res = res + i;
+    return res;
     throw new Error('Not implemented');
 }
 
@@ -82,6 +98,9 @@ function getSumBetweenNumbers(n1, n2) {
  *   10,10,10 =>  true
  */
 function isTriangle(a,b,c) {
+    if (a < b+c && b < a+c && c < a+b)
+        return true;
+    return false;
     throw new Error('Not implemented');
 }
 
@@ -119,6 +138,7 @@ function isTriangle(a,b,c) {
  *  
  */
 function doRectanglesOverlap(rect1, rect2) {
+
     throw new Error('Not implemented');
 }
 
@@ -150,6 +170,10 @@ function doRectanglesOverlap(rect1, rect2) {
  *   
  */
 function isInsideCircle(circle, point) {
+    if (Math.pow(point.x - circle.center.x,2) + Math.pow(point.y - circle.center.y,2) < Math.pow(circle.radius,2))
+        return true;
+    else
+        return false;
     throw new Error('Not implemented');
 }
 
@@ -166,6 +190,22 @@ function isInsideCircle(circle, point) {
  *   'entente' => null
  */
 function findFirstSingleChar(str) {
+  var ans="";
+    for (var i = 0; i < str.length; i++) {
+        var ch = str.charAt(i);
+        var temp = 0;
+        for (var j = 0; j < str.length; j++) {
+            if (ch == str[j])
+                temp = temp + 1;
+        }
+        if (temp == 1) {
+            ans = ch;
+            break;
+        }
+    }
+    if (ans.length < 1)
+        return null;
+    return ans;
     throw new Error('Not implemented');
 }
 
@@ -192,6 +232,27 @@ function findFirstSingleChar(str) {
  *
  */
 function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+    var tmp = '';
+    if (isStartIncluded == true)
+        tmp+='[';
+    else
+        tmp += '(';
+    if (a > b)
+    {
+        tmp += b.toString();
+        tmp += ', ';
+        tmp += a.toString();
+    }
+    else {
+        tmp += a.toString();
+        tmp += ', ';
+        tmp += b.toString();
+    }
+    if (isEndIncluded == true)
+        tmp += ']';
+    else
+        tmp += ')';
+    return tmp;
     throw new Error('Not implemented');
 }
 
@@ -209,6 +270,10 @@ function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
  * 'noon' => 'noon'
  */
 function reverseString(str) {
+    var tmp = new String();
+    for (var i = str.length-1; i > -1; i--)
+        tmp+=str[i];
+    return tmp;
     throw new Error('Not implemented');
 }
 
@@ -226,6 +291,15 @@ function reverseString(str) {
  *   34143 => 34143
  */
 function reverseInteger(num) {
+    var res = 0;
+    var t = num;
+    while (t != 0)
+    {
+        res = res*10;
+        res = res + t%10;
+        t = Math.floor(t/10);
+    }
+    return res;
     throw new Error('Not implemented');
 }
 
@@ -251,6 +325,29 @@ function reverseInteger(num) {
  *   4916123456789012 => false
  */
 function isCreditCardNumber(ccn) {
+   /* var str = ccn.toString();
+    var o = '';
+    var sum = 0;
+    for (var i = str.length - 1; i >= 0; i--)
+        o += str[i];
+   for (var i = 0; i > o.length; i++){
+        if ((i + 1) % 2 == 0){
+            var tmp = parseInt(o[i], 10) * 2;
+            if (tmp > 9){
+                tmp = tmp - 9;
+                sum += tmp;
+            } else {
+                sum += tmp;
+            }
+        } else {
+            var tmp = parseInt(o[i], 10);
+            sum += tmp;
+        }
+    }
+    if (sum % 10 == 0) {
+        return true;
+    } else return false;
+    return o;*/
     throw new Error('Not implemented');
 }
 
@@ -269,7 +366,24 @@ function isCreditCardNumber(ccn) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(num) {
+function getDigitalRoot(num){
+    var res = 0;
+    var t = num;
+    var tmp = 0;
+    while (t != 0)
+    {
+
+        res += t%10;
+        t = Math.floor(t/10);
+    }
+    if (res > 10)
+    {
+        tmp += res%10;
+        tmp += Math.floor(res/10);
+    }
+    else
+        tmp = res;
+    return tmp;
     throw new Error('Not implemented');
 }
 
@@ -296,9 +410,30 @@ function getDigitalRoot(num) {
  *   '{[(<{[]}>)]}' = true 
  */
 function isBracketsBalanced(str) {
+    /*var tmp = ['[', '<', '{', '('];
+    var tmp2 = [']', '>', '}', ')'];
+    var t1 = 0, t2 = 0;
+    var check = false;
+    for (var i = 0; i < str.length; i++){
+        for (var j = 0; j < tmp.length; j++){
+            if (str[i] == tmp[j])
+                t1++;
+            else if (str[i] == tmp2[j])
+                t2++;
+        }
+    }
+    if (t1 == t2) {
+        if (str.length == 2) {
+            for (var i = 0; i < tmp.length + 1; i++){
+                if (str[0] == tmp[i] && str[1] == tmp2[i]) {
+                    check = false;
+                } else check = true;
+            }
+        } else  check = true;
+    } else check = false;
+    return check;*/
     throw new Error('Not implemented');
 }
-
 
 /**
  * Returns the human readable string of time period specified by the start and end time.
@@ -356,6 +491,17 @@ function timespanToHumanString(startDate, endDate) {
  *    365, 10 => '365'
  */
 function toNaryString(num, n) {
+    var tmp = '';
+    var t = num;
+    while ( t >= n )
+    {
+        var test = t%n;
+        tmp += new String(test);
+        t = Math.floor(t/n);
+    }
+    tmp += t.toString();
+    tmp = tmp.split("").reverse().join("");
+    return tmp;
     throw new Error('Not implemented');
 }
 
@@ -396,6 +542,24 @@ function getCommonDirectoryPath(pathes) {
  *
  */
 function getMatrixProduct(m1, m2) {
+    var rowsM1 = m1.length, colsM1 = m1[0].length;
+    var rowsM2 = m2.length, colsM2 = m2[0].length;
+    var res = [];
+    if (colsM1 != rowsM2)
+        return false;
+    for (var i = 0; i < rowsM1;i++)
+        res[i] = [];
+    for (var i = 0; i < colsM2;i++)
+    {
+        for (var j = 0; j <rowsM1;j++)
+        {
+            var tmp = 0;
+            for (var k = 0; k < rowsM2;k++)
+                tmp += m1[j][k]*m2[k][i];
+            res[j][i] = tmp;
+        }
+    }
+    return res;
     throw new Error('Not implemented');
 }
 
