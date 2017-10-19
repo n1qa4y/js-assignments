@@ -138,7 +138,12 @@ function isTriangle(a,b,c) {
  *  
  */
 function doRectanglesOverlap(rect1, rect2) {
+    if ((rect1.left > (rect2.left + rect2.width)) || (rect2.left > (rect1.left + rect1.width)))
+        return false;
 
+    if ((rect1.top > (rect2.top + rect2.height)) || (rect2.top > (rect1.top + rect1.height)))
+        return false;
+    return true;
     throw new Error('Not implemented');
 }
 
@@ -325,29 +330,25 @@ function reverseInteger(num) {
  *   4916123456789012 => false
  */
 function isCreditCardNumber(ccn) {
-   /* var str = ccn.toString();
-    var o = '';
+    var tmp = ccn.toString();
+    tmp = tmp.split("").reverse().join("");
     var sum = 0;
-    for (var i = str.length - 1; i >= 0; i--)
-        o += str[i];
-   for (var i = 0; i > o.length; i++){
-        if ((i + 1) % 2 == 0){
-            var tmp = parseInt(o[i], 10) * 2;
-            if (tmp > 9){
-                tmp = tmp - 9;
-                sum += tmp;
-            } else {
-                sum += tmp;
-            }
+    for (var i = 0; i < tmp.length; i++){
+        if ((i+1) % 2 == 0){
+            var temp = parseInt(tmp[i])*2;
+            if (temp > 9){
+                temp -= 9;
+            } else {};
+            sum += temp;
         } else {
-            var tmp = parseInt(o[i], 10);
-            sum += tmp;
+            var temp = parseInt(tmp[i]);
+            sum += temp;
         }
     }
-    if (sum % 10 == 0) {
+    if (sum % 10 == 0)
         return true;
-    } else return false;
-    return o;*/
+    else
+        return false;
     throw new Error('Not implemented');
 }
 
@@ -410,28 +411,37 @@ function getDigitalRoot(num){
  *   '{[(<{[]}>)]}' = true 
  */
 function isBracketsBalanced(str) {
-    /*var tmp = ['[', '<', '{', '('];
-    var tmp2 = [']', '>', '}', ')'];
-    var t1 = 0, t2 = 0;
-    var check = false;
-    for (var i = 0; i < str.length; i++){
-        for (var j = 0; j < tmp.length; j++){
-            if (str[i] == tmp[j])
-                t1++;
-            else if (str[i] == tmp2[j])
-                t2++;
+
+    var Brackets = new Map();
+    Brackets.set(']', '[');
+    Brackets.set('}', '{');
+    Brackets.set(')', '(');
+    Brackets.set('>', '<');
+
+    var clBrackets = [...Brackets.keys()];
+    var opBrackets = [...Brackets.values()];
+
+    var tmp = [];
+    var len = str.length;
+
+    for (var i = 0; i < len; i++) {
+        var ch = str[i];
+
+        if (opBrackets.indexOf(ch) > -1) {
+            tmp.push(ch);
+        } else if (clBrackets.indexOf(ch) > -1) {
+
+            var expBracket = Brackets.get(ch);
+            if (tmp.length === 0 || (tmp.pop() !== expBracket)) {
+                return false;
+            }
+
+        } else {
+            continue;
         }
     }
-    if (t1 == t2) {
-        if (str.length == 2) {
-            for (var i = 0; i < tmp.length + 1; i++){
-                if (str[0] == tmp[i] && str[1] == tmp2[i]) {
-                    check = false;
-                } else check = true;
-            }
-        } else  check = true;
-    } else check = false;
-    return check;*/
+
+    return (tmp.length === 0);
     throw new Error('Not implemented');
 }
 
@@ -467,6 +477,59 @@ function isBracketsBalanced(str) {
  *
  */
 function timespanToHumanString(startDate, endDate) {
+    var date = Math.abs(startDate.getTime() - endDate.getTime());
+    switch(true)
+    {
+        case date <= 1000*45:
+        {
+            return 'a few seconds ago';
+        }
+        case date <= 1000*90:
+        {
+            return 'a minute ago';
+        }
+        case date <= 1000*60*45:
+        {
+            var passed_Minutes = Math.round((date - 1) / (1000 * 60));
+            return `${passed_Minutes} minutes ago`;
+        }
+        case date <= 1000*60*90:
+        {
+            return 'an hour ago';
+        }
+        case date <= 1000*60*60*22:
+        {
+            var passed_Hours = Math.round((date - 1) / (1000 * 60 * 60));
+            return `${passed_Hours} hours ago`;
+        }
+        case date <= 1000*60*60*36:
+        {
+            return 'a day ago';
+        }
+        case date <= 1000*60*60*24*25:
+        {
+            var passed_Days = Math.round((date - 1) / (1000 * 60 * 60*24));
+            return `${passed_Days} days ago`;
+        }
+        case date <= 1000*60*60*24*45:
+        {
+            return 'a month ago';
+        }
+        case date <= 1000*60*60*24*345:
+        {
+            var passed_Monthes = Math.round((date - 1) / (1000 * 60 * 60*24*30));
+            return `${passed_Monthes} months ago`;
+        }
+        case date <= 1000*60*60*24*545:
+        {
+            return `a year ago`;
+        }
+        case date > 1000*60*60*24*545:
+        {
+            var passed_Years = Math.round((date - 1) / (1000 * 60 * 60*24*365));
+            return `${passed_Years} years ago`;
+        }
+    }
     throw new Error('Not implemented');
 }
 
@@ -519,6 +582,18 @@ function toNaryString(num, n) {
  *   ['/web/favicon.ico', '/web-scripts/dump', '/webalizer/logs'] => '/'
  */
 function getCommonDirectoryPath(pathes) {
+    var res = pathes[0].split('/');
+    for(var i=1,count;i < pathes.length;i++) {
+        var tmpstr = pathes[i].split('/');
+        for (count = 0; count < tmpstr.length; count++) {
+            if(res[count] !== tmpstr[count])
+                break;
+        }
+        res = res.slice(0,count);
+    }
+    if(res.length === 0)
+        return "";
+    return res.join('/')+'/';
     throw new Error('Not implemented');
 }
 
@@ -595,7 +670,20 @@ function getMatrixProduct(m1, m2) {
  *
  */
 function evaluateTicTacToePosition(position) {
-    throw new Error('Not implemented');
+    for(let i=0;i<3;i++) {
+        if (position[i][0] === position[i][1] && position[i][1] === position[i][2] && position[i][0] !==undefined) {
+            return position[i][0];
+        }
+    }
+    for(let i=0;i<3;i++) {
+        if (position[0][i] === position[1][i] && position[1][i] === position[2][i] && position[0][i] !==undefined) {
+            return position[0][i];
+        }
+    }
+    if (position[0][0] === position[1][1] && position[1][1] === position[2][2] && position[1][1] !==undefined)
+        return position[0][0];
+    if (position[0][2] === position[1][1] && position[1][1] === position [2][0] && position[1][1] !==undefined)
+        return position[0][2];
 }
 
 
