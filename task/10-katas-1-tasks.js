@@ -17,8 +17,37 @@
  *  ]
  */
 function createCompassPoints() {
-    throw new Error('Not implemented');
-    var sides = ['N','E','S','W'];  // use array of cardinal directions only!
+    function* directCoors(from, to, dir) {
+        let res = [`${from}b${to}`, `${from}${from}${to}`, `${from}${to}b${from}`, `${from}${to}`, `${from}${to}b${to}`, `${to}${from}${to}`, `${to}b${from}`];
+
+        if (dir == "f")
+        res.reverse();
+
+        for (let i of res) {
+            yield i;
+        }
+    }
+
+    let res = [],
+        azimuth = 0,
+        items = [
+            {dir: "N", func: directCoors("N", "E", "d")},
+            {dir: "E", func: directCoors("S", "E", "f")},
+            {dir: "S", func: directCoors("S", "W", "d")},
+            {dir: "W", func: directCoors("N", "W", "f")}
+        ];
+
+    items.forEach(item => {
+        res.push({abbreviation: item.dir, azimuth: azimuth});
+        azimuth += 11.25;
+
+        for (let i = 0; i < 7; i++) {
+            res.push({abbreviation: item.func.next().value, azimuth: azimuth});
+            azimuth += 11.25;
+        }
+    });
+
+    return res;
 }
 
 
@@ -56,6 +85,24 @@ function createCompassPoints() {
  *   'nothing to do' => 'nothing to do'
  */
 function* expandBraces(str) {
+    const queue = [],
+    regex = new RegExp("\{([0-9a-zA-Z\.,]+)\}", 'i'),
+    itemSet = new Set;
+    queue.push(str);
+    while(queue.length){
+        let tmp = queue.shift();
+        let matches = tmp.match(regex);
+        
+        if (matches != null){
+            let Arrtmp = matches[1].split(',');
+            Arrtmp.forEach(curr=>{
+                queue.push(tmp.replace(matches[0],curr));
+            });
+        } else if (!itemSet.add(tmp)){
+            itemSet.add(tmp);
+            yield tmp;
+        }
+    }
     throw new Error('Not implemented');
 }
 
@@ -88,6 +135,26 @@ function* expandBraces(str) {
  *
  */
 function getZigZagMatrix(n) {
+    let res = new Array(n).fill().map(()=> new Array(n).fill());
+    let i = 0, j = 0;
+    let d = -1;
+    let start = 0, end = n*n - 1;
+    do {
+        res[i][j] = start++;
+        res[n - i - 1][n - j - 1] = end--;
+        i += d;
+        j -= d;
+        if (i < 0){
+            i++;
+            d = -d;
+        } else if (j < 0){
+            j++;
+            d = -d;
+        }
+    } while (start < end);
+    if (start === end)
+    res[i][j] = start;
+    return res;
     throw new Error('Not implemented');
 }
 
@@ -113,6 +180,27 @@ function getZigZagMatrix(n) {
  *
  */
 function canDominoesMakeRow(dominoes) {
+    function dfs (curr, value, left){
+        if (left === 0){
+            res = true;
+            return;
+        }
+        visited[curr] = true;
+        for (let i = 0; i < dominoes.length; i++)
+        if (!visited[i]){
+            if (dominoes[i].indexOf(value) != -1){
+                dfs(i, dominoes[i][0] == value ? dominoes[i][1] : dominoes[i][0], left - 1);
+            }
+        }
+        visited[curr] = false;
+    }
+    let res = false,
+    visited = Array.from({length: dominoes.length}, ()=> false);
+    for (let i = 0; i < dominoes.length; i++){
+        dfs(i, dominoes[i][0], dominoes.length - 1);
+        dfs(i, dominoes[i][1], dominoes.length - 1);
+    }
+    return res;
     throw new Error('Not implemented');
 }
 
@@ -137,6 +225,29 @@ function canDominoesMakeRow(dominoes) {
  * [ 1, 2, 4, 5]          => '1,2,4,5'
  */
 function extractRanges(nums) {
+    let start = nums[0];
+    let ranges = [];
+    for (let i = 0; i < nums.length -1; i++){
+        if (nums[i + 1] === nums[i] + 1)
+        continue;
+        if (nums[i] - start > 1)
+        ranges.push([`${start}-${nums[i]}`]);
+        else if (nums[i] - start === 1){
+            ranges.push([nums[i-1]]);
+            ranges.push([nums[i]]);
+        }
+        else {
+            ranges.push([nums[i]]);
+        }
+        start = nums[i + 1];
+    }
+    if (nums[nums.length - 1] - start > 1)
+    ranges.push([`${start}-${[nums[nums.length - 1]]}`]);
+    else{
+        ranges.push([nums[nums.length - 2]]);
+        ranges.push([nums[nums.length - 1]]);
+    }
+    return ranges.join(',');
     throw new Error('Not implemented');
 }
 
